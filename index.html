@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Libya Traffic Intelligence — Road Accident Analytics &amp; Risk Platform</title>
+<meta name="description" content="A data-driven traffic accident analytics and risk analysis platform for Libya, built as a graduation project with synthetic demo data.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<div class="app-shell" id="app-shell">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+    <div class="sidebar-brand">
+      <div class="mark" aria-hidden="true">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-triangle-alert"></use></svg>
+      </div>
+      <div class="brand-text">
+        <strong>Libya Traffic Intelligence</strong>
+        <span>Risk &amp; Analytics Platform</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <a class="nav-item active" data-page="dashboard" href="#dashboard">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-layout-dashboard"></use></svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-page="accidents" href="#accidents">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-car-front"></use></svg>
+        <span>Accidents</span>
+      </a>
+      <a class="nav-item" data-page="analytics" href="#analytics">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-chart-no-axes-column"></use></svg>
+        <span>Analytics</span>
+      </a>
+      <a class="nav-item" data-page="hotspots" href="#hotspots">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-map-pin"></use></svg>
+        <span>Hotspots</span>
+      </a>
+      <a class="nav-item" data-page="risk" href="#risk">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-triangle-alert"></use></svg>
+        <span>Risk Analysis</span>
+      </a>
+      <a class="nav-item" data-page="reports" href="#reports">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-file-text"></use></svg>
+        <span>Reports</span>
+      </a>
+      <a class="nav-item" data-page="about" href="#about">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-info"></use></svg>
+        <span>About</span>
+      </a>
+    </nav>
+
+    <button class="icon-btn sidebar-toggle" id="sidebar-collapse-btn" aria-label="Collapse sidebar" title="Collapse sidebar">
+      <svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-panel-left-close"></use></svg>
+    </button>
+
+    <div class="sidebar-footer">
+      Libya Traffic Intelligence<br>
+      Graduation Project · Synthetic Demo Data
+    </div>
+  </aside>
+
+  <div class="sidebar-scrim" id="sidebar-scrim"></div>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main-content">
+    <header class="top-header">
+      <button class="icon-btn mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-menu"></use></svg>
+      </button>
+
+      <div class="header-search">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-search"></use></svg>
+        <input type="search" id="global-search" placeholder="Search by ID, city, road, type, or cause…" aria-label="Global search">
+        <div class="search-results" id="global-search-results"></div>
+      </div>
+
+      <div class="header-right">
+        <span class="header-clock" id="header-clock"></span>
+        <button class="icon-btn" id="header-refresh-btn" aria-label="Reload dataset" title="Reload dataset">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-rotate-cw"></use></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main-content">
+
+      <!-- ============ DASHBOARD / OVERVIEW ============ -->
+      <section class="page active" id="page-dashboard" aria-labelledby="dashboard-title">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Overview</div>
+            <h1 class="page-title" id="dashboard-title">Libya Traffic Intelligence</h1>
+            <p class="page-subtitle">Data-driven road accident analysis and risk intelligence for Libya.</p>
+          </div>
+        </div>
+
+        <div class="demo-notice">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-circle-alert"></use></svg>
+          <span><strong>Demo Dataset —</strong> The accident records shown in this application are synthetic data created for demonstration and software testing purposes. They do not represent official Libyan traffic statistics.</span>
+        </div>
+
+        <div id="dashboard-loading" class="state-block">
+          <div class="spinner" role="status" aria-label="Loading dataset"></div>
+          <h4>Loading accident dataset…</h4>
+          <p>Reading and processing data/accidents.csv.</p>
+        </div>
+
+        <div id="dashboard-error" class="state-block" style="display:none;">
+          <h4>Couldn't load the CSV automatically</h4>
+          <p id="dashboard-error-msg">Local browser security prevented automatic CSV loading. Please run this project with a simple local server such as VS Code Live Server, or use the option below.</p>
+          <div class="upload-panel">
+            <strong>Load CSV File</strong>
+            <p class="text-muted" style="font-size:12.5px;">Select <code>data/accidents.csv</code> from the project folder to continue.</p>
+            <label class="btn btn-primary" for="csv-file-input">Choose File</label>
+            <input type="file" id="csv-file-input" accept=".csv">
+          </div>
+        </div>
+
+        <div id="dashboard-content" style="display:none; flex-direction:column; gap:24px;">
+
+          <div class="kpi-grid" id="kpi-grid"></div>
+
+          <div class="grid-2">
+            <div class="surface">
+              <div class="surface-header">
+                <div><h3>Accident Trend</h3><div class="subtext">Monthly accidents across the dataset period</div></div>
+              </div>
+              <div class="surface-body"><div id="chart-trend"></div></div>
+            </div>
+            <div class="surface">
+              <div class="surface-header">
+                <div><h3>Severity Distribution</h3><div class="subtext">Share of accidents by severity</div></div>
+              </div>
+              <div class="surface-body"><div id="chart-severity-donut"></div></div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="surface">
+              <div class="surface-header">
+                <div><h3>Accident Types</h3><div class="subtext">Most common accident categories</div></div>
+              </div>
+              <div class="surface-body"><div id="chart-types-bar"></div></div>
+            </div>
+            <div class="surface">
+              <div class="surface-header">
+                <div><h3>Top Dangerous Cities</h3><div class="subtext">By total recorded accidents</div></div>
+              </div>
+              <div class="surface-body"><div id="chart-cities-hbar"></div></div>
+            </div>
+          </div>
+
+          <div class="surface">
+            <div class="surface-header">
+              <div><h3>Accident Time Distribution</h3><div class="subtext">By hour of day (0–23) — rush-hour bars highlighted</div></div>
+            </div>
+            <div class="surface-body"><div id="chart-hour"></div></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="surface">
+              <div class="surface-header">
+                <div><h3>Recent Accidents</h3><div class="subtext">Most recently recorded entries</div></div>
+                <button class="btn btn-ghost btn-sm" data-goto="accidents">View all <svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-arrow-right"></use></svg></button>
+              </div>
+              <div class="table-scroll"><table class="data-table" id="recent-table" aria-label="Recent accidents"></table></div>
+            </div>
+            <div class="surface">
+              <div class="surface-header">
+                <div><h3>Risk Summary</h3><div class="subtext">Data-driven risk score, not an official model</div></div>
+              </div>
+              <div class="surface-body">
+                <div class="risk-gauge-wrap">
+                  <div class="eyebrow">Overall Risk Score</div>
+                  <div class="risk-score-big" id="overview-risk-score">—</div>
+                  <span class="badge" id="overview-risk-badge">—</span>
+                </div>
+                <div class="divider"></div>
+                <div id="overview-insights" class="insights-list"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============ ACCIDENTS ============ -->
+      <section class="page" id="page-accidents" aria-labelledby="accidents-title">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Records</div>
+            <h1 class="page-title" id="accidents-title">Accidents</h1>
+            <p class="page-subtitle">Browse, filter, and inspect every accident record in the synthetic dataset.</p>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-header">
+            <div><h3>Filters</h3><div class="subtext">Narrow the dataset — updates KPIs, charts, map, and table together</div></div>
+            <button class="btn btn-ghost btn-sm filters-toggle-mobile" id="filters-toggle-mobile">Show filters</button>
+          </div>
+          <div class="filters-panel" id="filters-panel"></div>
+          <div class="active-filter-chips" id="filter-chips" style="display:none;"></div>
+          <div class="filters-actions">
+            <button class="btn btn-primary btn-sm" id="apply-filters-btn">Apply Filters</button>
+            <button class="btn btn-secondary btn-sm" id="reset-filters-btn">Reset Filters</button>
+            <span class="text-muted" id="filter-result-count" style="font-size:12.5px; margin-left:auto;"></span>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="table-toolbar">
+            <h3>Accident Records</h3>
+            <div class="flex-row">
+              <button class="btn btn-secondary btn-sm" id="export-table-csv-btn">Export CSV</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="accidents-table" aria-label="Filtered accident records"></table>
+          </div>
+          <div id="accidents-table-empty" style="display:none;"></div>
+          <div class="table-pagination" id="accidents-pagination"></div>
+        </div>
+      </section>
+
+      <!-- ============ ANALYTICS ============ -->
+      <section class="page" id="page-analytics" aria-labelledby="analytics-title">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Deep Dive</div>
+            <h1 class="page-title" id="analytics-title">Analytics</h1>
+            <p class="page-subtitle">Temporal, geographic, severity, and cause analysis generated from the current filters.</p>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-header"><div><h3>Key Insights</h3><div class="subtext">Automatically generated from calculated values</div></div></div>
+          <div class="surface-body"><div id="analytics-insights" class="insights-list"></div></div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-header"><div><h3>Temporal Analysis</h3><div class="subtext">Accidents by day of week and month</div></div></div>
+          <div class="surface-body grid-2">
+            <div><h4 style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">By Day of Week</h4><div id="chart-dow"></div></div>
+            <div><h4 style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">By Month (Trend)</h4><div id="chart-analytics-trend"></div></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-header"><div><h3>Geographic Analysis</h3><div class="subtext">Top roads by accident count</div></div></div>
+            <div class="surface-body"><div id="chart-roads-hbar"></div></div>
+          </div>
+          <div class="surface">
+            <div class="surface-header"><div><h3>Severity Analysis</h3><div class="subtext">Distribution across severity classes</div></div></div>
+            <div class="surface-body"><div id="chart-analytics-severity"></div></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-header"><div><h3>Cause Analysis</h3><div class="subtext">Most frequently reported causes</div></div></div>
+            <div class="surface-body"><div id="chart-causes-bar"></div></div>
+          </div>
+          <div class="surface">
+            <div class="surface-header"><div><h3>Weather &amp; Road Condition</h3><div class="subtext">Environmental factors at time of accident</div></div></div>
+            <div class="surface-body grid-2" style="gap:12px;">
+              <div id="chart-weather"></div>
+              <div id="chart-road-condition"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ HOTSPOTS ============ -->
+      <section class="page" id="page-hotspots" aria-labelledby="hotspots-title">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Spatial Patterns</div>
+            <h1 class="page-title" id="hotspots-title">Hotspots</h1>
+            <p class="page-subtitle">Synthetic Data Hotspots — concentration areas calculated from the current dataset, not officially validated dangerous locations.</p>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-header">
+            <div><h3>Accident Map</h3><div class="subtext">Plotted from latitude/longitude values in the dataset</div></div>
+          </div>
+          <div class="surface-body">
+            <div class="map-shell" id="map-shell">
+              <div class="map-mode-toggle" id="map-mode-toggle">
+                <button class="active" data-mode="points">Points</button>
+                <button data-mode="heatmap">Heatmap</button>
+              </div>
+              <div class="map-controls">
+                <button id="map-zoom-in" aria-label="Zoom in" title="Zoom in"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-plus"></use></svg></button>
+                <button id="map-zoom-out" aria-label="Zoom out" title="Zoom out"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-minus"></use></svg></button>
+                <button id="map-reset" aria-label="Reset view" title="Reset view"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-rotate-ccw"></use></svg></button>
+              </div>
+              <div class="map-legend">
+                <div class="map-legend-title">Severity</div>
+                <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--sev-minor)"></span>Minor</div>
+                <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--sev-moderate)"></span>Moderate</div>
+                <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--sev-severe)"></span>Severe</div>
+                <div class="map-legend-item"><span class="map-legend-dot" style="background:var(--sev-critical-glow)"></span>Critical</div>
+              </div>
+              <div id="map-container" style="width:100%;height:100%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-header"><div><h3>Top Hotspot Cities</h3><div class="subtext">Ranked by synthetic accident density</div></div></div>
+            <div class="surface-body"><div class="rank-list" id="hotspot-city-list"></div></div>
+          </div>
+          <div class="surface">
+            <div class="surface-header"><div><h3>Top Hotspot Roads</h3><div class="subtext">Ranked by synthetic accident density</div></div></div>
+            <div class="surface-body"><div class="rank-list" id="hotspot-road-list"></div></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-header"><div><h3>Severity Concentration</h3><div class="subtext">Share of Severe/Critical accidents by top city</div></div></div>
+            <div class="surface-body"><div id="hotspot-severity-chart"></div></div>
+          </div>
+          <div class="surface">
+            <div class="surface-header"><div><h3>Time Concentration</h3><div class="subtext">Hotspot cities by hour of day</div></div></div>
+            <div class="surface-body"><div id="hotspot-time-chart"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RISK ANALYSIS ============ -->
+      <section class="page" id="page-risk" aria-labelledby="risk-title">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Risk Intelligence</div>
+            <h1 class="page-title" id="risk-title">Risk Analysis</h1>
+            <p class="page-subtitle">A transparent, data-driven risk score — not an officially validated road-safety model.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-header"><div><h3>Overall Risk Score</h3><div class="subtext">Normalized 0–100 across the current selection</div></div></div>
+            <div class="surface-body">
+              <div class="risk-gauge-wrap">
+                <div id="risk-gauge-chart"></div>
+                <div class="risk-score-big" id="risk-page-score">—</div>
+                <span class="badge" id="risk-page-badge">—</span>
+              </div>
+              <div class="risk-factors" id="risk-factors-list"></div>
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-header"><div><h3>Risk Level Distribution</h3><div class="subtext">Records classified Low / Medium / High</div></div></div>
+            <div class="surface-body"><div id="chart-risk-donut"></div></div>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-header">
+            <div>
+              <h3>Accident Risk Prediction</h3>
+              <div class="subtext">Demo statistical / rule-based prediction layer — not a trained production ML model</div>
+            </div>
+          </div>
+          <div class="surface-body">
+            <div class="prediction-grid">
+              <form id="prediction-form">
+                <div class="filters-panel" style="padding:0; grid-template-columns:1fr 1fr;">
+                  <div class="field">
+                    <label for="pred-city">City</label>
+                    <select id="pred-city"></select>
+                  </div>
+                  <div class="field">
+                    <label for="pred-road-type">Road Type</label>
+                    <select id="pred-road-type">
+                      <option>Highway</option><option>Urban Street</option><option>Ring Road</option>
+                      <option>Rural Road</option><option>Residential Street</option><option>Intersection</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="pred-time">Time</label>
+                    <input type="time" id="pred-time" value="18:30">
+                  </div>
+                  <div class="field">
+                    <label for="pred-day">Day</label>
+                    <select id="pred-day">
+                      <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+                      <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="pred-weather">Weather</label>
+                    <select id="pred-weather">
+                      <option>Clear</option><option>Cloudy</option><option>Rain</option>
+                      <option>Dust Storm</option><option>Fog</option><option>Windy</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="pred-road-condition">Road Condition</label>
+                    <select id="pred-road-condition">
+                      <option>Good</option><option>Fair</option><option>Poor</option><option>Very Poor</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="pred-traffic">Traffic Level</label>
+                    <select id="pred-traffic">
+                      <option>Low</option><option>Medium</option><option>High</option><option>Very High</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="pred-lighting">Lighting</label>
+                    <select id="pred-lighting">
+                      <option>Daylight</option><option>Street Lights</option><option>Dark</option><option>Low Visibility</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top:16px;">Predict Risk</button>
+              </form>
+
+              <div class="surface prediction-result" id="prediction-result">
+                <p class="prediction-placeholder">Fill in the conditions and press "Predict Risk" to see a demo risk estimate.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ REPORTS ============ -->
+      <section class="page" id="page-reports" aria-labelledby="reports-title">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Export</div>
+            <h1 class="page-title" id="reports-title">Reports</h1>
+            <p class="page-subtitle">Build a scoped summary report and export it as CSV or print to PDF.</p>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-header"><div><h3>Report Parameters</h3></div></div>
+          <div class="filters-panel" id="report-filters-panel">
+            <div class="field"><label for="report-date-from">Date From</label><input type="date" id="report-date-from"></div>
+            <div class="field"><label for="report-date-to">Date To</label><input type="date" id="report-date-to"></div>
+            <div class="field"><label for="report-city">City</label><select id="report-city"><option value="">All Cities</option></select></div>
+            <div class="field"><label for="report-severity">Severity</label><select id="report-severity"><option value="">All Severities</option><option>Minor</option><option>Moderate</option><option>Severe</option><option>Critical</option></select></div>
+            <div class="field"><label for="report-type">Accident Type</label><select id="report-type"><option value="">All Types</option></select></div>
+          </div>
+          <div class="filters-actions">
+            <button class="btn btn-primary btn-sm" id="generate-report-btn">Generate Report</button>
+          </div>
+        </div>
+
+        <div id="report-output" style="display:none; flex-direction:column; gap:20px;">
+          <div class="surface" id="report-print-area">
+            <div class="surface-header">
+              <div><h3>Report Summary</h3><div class="subtext" id="report-scope-desc"></div></div>
+              <div class="flex-row">
+                <button class="btn btn-secondary btn-sm" id="report-export-csv-btn">Export CSV</button>
+                <button class="btn btn-secondary btn-sm" id="report-print-btn">Print Report</button>
+              </div>
+            </div>
+            <div class="surface-body">
+              <div class="report-summary-grid" id="report-stats-grid"></div>
+              <div class="divider"></div>
+              <div class="grid-3">
+                <div>
+                  <h4 style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Top Causes</h4>
+                  <div id="report-top-causes" class="rank-list"></div>
+                </div>
+                <div>
+                  <h4 style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Top Roads</h4>
+                  <div id="report-top-roads" class="rank-list"></div>
+                </div>
+                <div>
+                  <h4 style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Top Cities</h4>
+                  <div id="report-top-cities" class="rank-list"></div>
+                </div>
+              </div>
+              <div class="divider"></div>
+              <h4 style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">Key Insights</h4>
+              <div id="report-insights" class="insights-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ABOUT ============ -->
+      <section class="page" id="page-about" aria-labelledby="about-title">
+        <div class="page-header">
+          <div>
+            <div class="eyebrow">Project</div>
+            <h1 class="page-title" id="about-title">About</h1>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-body about-hero">
+            <h3>Libya Traffic Intelligence</h3>
+            <p class="text-secondary" style="line-height:1.7;">
+              Libya Traffic Intelligence is a data-driven road accident analytics and risk analysis platform
+              built as a graduation-style software engineering project. It processes a synthetic
+              2,000+ record accident dataset entirely in the browser — parsing CSV, computing statistics,
+              rendering charts and a stylized map from scratch, and demonstrating a transparent
+              rule-based risk-scoring and prediction layer — all without a backend, a framework, or a build step.
+            </p>
+            <div class="demo-notice">
+              <svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-circle-alert"></use></svg>
+              <span>All accident records are synthetic and generated for demonstration purposes. They are not official Libyan government statistics.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="surface">
+          <div class="surface-header"><div><h3>Technology Stack</h3></div></div>
+          <div class="surface-body">
+            <div class="tech-pill-row">
+              <span class="tech-pill">HTML5</span>
+              <span class="tech-pill">CSS3</span>
+              <span class="tech-pill">Vanilla JavaScript (ES6+)</span>
+              <span class="tech-pill">SVG</span>
+              <span class="tech-pill">CSV / Fetch &amp; File APIs</span>
+              <span class="tech-pill">No frameworks</span>
+              <span class="tech-pill">No build step</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="surface">
+            <div class="surface-header"><div><h3>Data Science Approach</h3></div></div>
+            <div class="surface-body">
+              <p class="text-secondary" style="line-height:1.7; font-size:13.5px;">
+                Records are parsed with a hand-written quoted-field-aware CSV parser, validated, and
+                converted to typed numeric/derived fields (hour, weekend flag, rush-hour flag).
+                Analytics functions compute distributions, cross-tabulations, and hotspot rankings on
+                demand, so every chart reacts to the active filter set in real time. The risk score is a
+                transparent weighted sum over severity share, fatality rate, road condition, traffic,
+                lighting, weather, and rush-hour concentration — deliberately readable rather than a black box.
+              </p>
+            </div>
+          </div>
+          <div class="surface">
+            <div class="surface-header"><div><h3>Future Development</h3></div></div>
+            <div class="surface-body">
+              <ul style="margin:0; padding-left:18px; color:var(--text-secondary); font-size:13.5px; line-height:1.9;">
+                <li>Integration with real government traffic datasets</li>
+                <li>Real-time traffic and weather API feeds</li>
+                <li>GPS and traffic-camera data ingestion</li>
+                <li>A trained machine-learning severity/risk model behind <code>predictRisk()</code></li>
+                <li>Time-series forecasting for accident volume</li>
+                <li>Real-time alerts and a companion mobile application</li>
+                <li>Government / municipal system integration</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============ ACCIDENT DETAIL MODAL ============ -->
+<div class="modal-overlay" id="accident-modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h3 id="modal-title">Accident Details</h3>
+      <button class="icon-btn" id="modal-close-btn" aria-label="Close">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-x"></use></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="js/icons.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/map.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/prediction.js"></script>
+<script src="js/reports.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

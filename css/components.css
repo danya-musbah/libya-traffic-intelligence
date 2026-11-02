@@ -1,0 +1,79 @@
+/* ==========================================================================
+   Mobile sidebar drawer overlay
+   ========================================================================== */
+
+.sidebar-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 900;
+  display: none;
+}
+.sidebar-scrim.open { display: block; }
+
+/* ==========================================================================
+   Upload / fallback panel
+   ========================================================================== */
+
+.upload-panel {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0,0,0,0.1);
+}
+.upload-panel input[type="file"] { display: none; }
+
+/* ==========================================================================
+   Checkbox / date-range compact rows
+   ========================================================================== */
+
+.inline-fields {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.inline-fields .field { flex: 1; min-width: 140px; }
+
+/* ==========================================================================
+   Legend swatches for severity across app
+   ========================================================================== */
+
+.sev-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.sev-swatch.minor { background: var(--sev-minor); }
+.sev-swatch.moderate { background: var(--sev-moderate); }
+.sev-swatch.severe { background: var(--sev-severe); }
+.sev-swatch.critical { background: var(--sev-critical-glow); }
+
+/* ==========================================================================
+   Print styles (used for report "Print Report")
+   ========================================================================== */
+
+@media print {
+  .sidebar, .top-header, .filters-panel, .filters-actions,
+  .table-pagination, .btn, .map-controls, .toast-stack, .modal-overlay,
+  .active-filter-chips, .header-search { display: none !important; }
+
+  .main-content { margin-left: 0 !important; }
+  body { background: #fff; color: #111; }
+  .surface { border: 1px solid #ccc; box-shadow: none; background: #fff; color: #111; }
+  .page { padding: 0; }
+  .kpi-value, h1, h2, h3 { color: #111 !important; }
+  .text-secondary, .kpi-label, .report-stat .label { color: #444 !important; }
+}
+
+/* ==========================================================================
+   Small utility classes
+   ========================================================================== */
+
+.flex-row { display: flex; align-items: center; gap: 8px; }
+.text-muted { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+.mt-8 { margin-top: 8px; }
+.divider { height: 1px; background: var(--border-subtle); margin: 16px 0; }
+
+.empty-search-highlight { background: rgba(165,145,50,0.35); border-radius: 2px; }

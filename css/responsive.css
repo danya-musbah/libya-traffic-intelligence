@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Responsive breakpoints
+   1280px+ default (desktop) — overrides cascade downward
+   ========================================================================== */
+
+@media (max-width: 1280px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .prediction-grid { grid-template-columns: 1fr; }
+  .report-summary-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 1024px) {
+  :root { --sidebar-width: 232px; }
+  .page { padding: 22px 20px 56px; }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s var(--ease-standard);
+    width: 260px !important;
+  }
+  .app-shell .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0 !important; }
+  .mobile-menu-btn { display: inline-flex !important; }
+  .sidebar-toggle { display: none; }
+  .top-header { padding: 0 16px; gap: 10px; }
+  .header-search { max-width: none; }
+  .header-clock { display: none; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: 1fr; }
+  .filters-panel { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .map-shell { height: 420px; }
+  .report-summary-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-value { font-size: 24px; }
+  .filters-panel { grid-template-columns: 1fr 1fr; padding: 16px; }
+  .surface-body { padding: 16px; }
+  .surface-header { padding: 14px 16px; }
+  .table-toolbar { padding: 12px 16px; flex-direction: column; align-items: stretch; }
+  .table-pagination { padding: 12px 16px; flex-direction: column; align-items: stretch; text-align: center; }
+  .pagination-controls { justify-content: center; }
+  .page { padding: 16px 14px 48px; }
+  .page-title { font-size: 22px; }
+  .modal { max-height: 92vh; }
+  .risk-score-big { font-size: 36px; }
+}
+
+@media (max-width: 430px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi-card { padding: 14px; }
+  .filters-panel { grid-template-columns: 1fr; }
+  .map-shell { height: 340px; }
+  .btn { padding: 9px 14px; font-size: 12.5px; }
+  .sidebar-brand .brand-text strong { font-size: 14px; }
+}
+
+@media (max-width: 375px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .prediction-badge-big { font-size: 18px; padding: 8px 20px; }
+}
+
+/* Ensure no horizontal overflow anywhere */
+html, body { max-width: 100%; }
