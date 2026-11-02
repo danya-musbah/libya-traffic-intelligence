@@ -25,6 +25,10 @@ const DataModule = (() => {
     'closure_duration_minutes', 'emergency_response_minutes',
     'is_weekend', 'is_rush_hour', 'year',
   ];
+  const INTEGER_FIELDS = [
+    'year', 'number_of_vehicles', 'number_of_injuries', 'number_of_fatalities',
+    'closure_duration_minutes',
+  ];
   const REQUIRED_FIELDS = [
     'accident_id', 'date', 'time', 'day_of_week', 'month', 'year', 'city',
     'district', 'road_name', 'road_type', 'latitude', 'longitude',
@@ -47,13 +51,16 @@ const DataModule = (() => {
   const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const SEVERITIES = ['Minor', 'Moderate', 'Severe', 'Critical'];
   const RISK_LEVELS = ['Low', 'Medium', 'High'];
+  const RUSH_HOURS = new Set([7, 8, 9, 13, 14, 15, 16, 19, 20, 21]);
 
   function normalizeRecord(rec, rowNumber) {
     const out = { ...rec };
     REQUIRED_TEXT_FIELDS.forEach(field => {
-      if (!String(rec[field] || '').trim()) {
+      const value = typeof rec[field] === 'string' ? rec[field].trim() : '';
+      if (!value) {
         throw new Error(`CSV row ${rowNumber} is missing a value for "${field}".`);
       }
+      out[field] = value;
     });
 
     NUMERIC_FIELDS.forEach(f => {
@@ -65,18 +72,24 @@ const DataModule = (() => {
       out[f] = number;
     });
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(rec.date)) {
+    if (INTEGER_FIELDS.some(field => !Number.isInteger(out[field]))) {
+      throw new Error(`CSV row ${rowNumber} contains a non-integer count, duration, or year.`);
+    }
+    if (out.number_of_vehicles < 1) {
+      throw new Error(`CSV row ${rowNumber} must include at least one vehicle.`);
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(out.date)) {
       throw new Error(`CSV row ${rowNumber} has an invalid date; expected YYYY-MM-DD.`);
     }
-    const date = new Date(`${rec.date}T00:00:00Z`);
-    if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== rec.date) {
+    const date = new Date(`${out.date}T00:00:00Z`);
+    if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== out.date) {
       throw new Error(`CSV row ${rowNumber} has an invalid calendar date.`);
     }
-    if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(rec.time)) {
+    if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(out.time)) {
       throw new Error(`CSV row ${rowNumber} has an invalid time; expected HH:MM.`);
     }
-    if (out.year !== date.getUTCFullYear() || rec.month !== MONTHS[date.getUTCMonth()] ||
-        rec.day_of_week !== DAYS[date.getUTCDay()]) {
+    if (out.year !== date.getUTCFullYear() || out.month !== MONTHS[date.getUTCMonth()] ||
+        out.day_of_week !== DAYS[date.getUTCDay()]) {
       throw new Error(`CSV row ${rowNumber} has date, year, month, or weekday values that do not agree.`);
     }
     if (!SEVERITIES.includes(rec.severity) || !RISK_LEVELS.includes(rec.risk_level)) {
@@ -86,6 +99,12 @@ const DataModule = (() => {
         ![0, 1].includes(out.is_rush_hour)) {
       throw new Error(`CSV row ${rowNumber} has an invalid 0/1 flag.`);
     }
+    if (out.is_weekend !== Number([5, 6].includes(date.getUTCDay()))) {
+      throw new Error(`CSV row ${rowNumber} has a weekend flag that does not match its date (Friday and Saturday are weekends).`);
+    }
+    if (out.is_rush_hour !== Number(RUSH_HOURS.has(Number(out.time.slice(0, 2))))) {
+      throw new Error(`CSV row ${rowNumber} has a rush-hour flag that does not match its time.`);
+    }
     if (out.latitude < -90 || out.latitude > 90 || out.longitude < -180 || out.longitude > 180) {
       throw new Error(`CSV row ${rowNumber} has coordinates outside the valid latitude/longitude ranges.`);
     }
@@ -94,7 +113,10 @@ const DataModule = (() => {
       .some(field => out[field] < 0)) {
       throw new Error(`CSV row ${rowNumber} contains a negative count, duration, or damage value.`);
     }
-    out.hour = Number(rec.time.slice(0, 2));
+    if ((out.road_closed === 1) !== (out.closure_duration_minutes > 0)) {
+      throw new Error(`CSV row ${rowNumber} has inconsistent road-closure status and duration.`);
+    }
+    out.hour = Number(out.time.slice(0, 2));
     return out;
   }
 
@@ -117,6 +139,13 @@ const DataModule = (() => {
     const objs = Utils.rowsToObjects(rows);
     const normalized = objs.map((record, index) => normalizeRecord(record, index + 2));
     if (!normalized.length) throw new Error('CSV contains no accident records.');
+    const ids = new Set();
+    normalized.forEach((record, index) => {
+      if (ids.has(record.accident_id)) {
+        throw new Error(`CSV row ${index + 2} duplicates accident ID "${record.accident_id}".`);
+      }
+      ids.add(record.accident_id);
+    });
 
     AppState.raw = normalized;
     AppState.filtered = normalized.slice();

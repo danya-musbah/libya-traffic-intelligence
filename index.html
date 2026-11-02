@@ -29,7 +29,7 @@
     </div>
 
     <nav class="sidebar-nav" id="sidebar-nav">
-      <a class="nav-item active" data-page="dashboard" href="#dashboard">
+      <a class="nav-item active" data-page="dashboard" href="#dashboard" aria-current="page">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-layout-dashboard"></use></svg>
         <span>Dashboard</span>
       </a>
@@ -59,7 +59,7 @@
       </a>
     </nav>
 
-    <button class="icon-btn sidebar-toggle" id="sidebar-collapse-btn" aria-label="Collapse sidebar" title="Collapse sidebar">
+    <button class="icon-btn sidebar-toggle" id="sidebar-collapse-btn" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar">
       <svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-panel-left-close"></use></svg>
     </button>
 
@@ -74,7 +74,7 @@
   <!-- ================= MAIN ================= -->
   <div class="main-content">
     <header class="top-header">
-      <button class="icon-btn mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu">
+      <button class="icon-btn mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu" aria-expanded="false">
         <svg class="icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-menu"></use></svg>
       </button>
 
@@ -154,7 +154,7 @@
             </div>
             <div class="surface">
               <div class="surface-header">
-                <div><h3>Top Dangerous Cities</h3><div class="subtext">By total recorded accidents</div></div>
+                <div><h3>Cities by Recorded Accidents</h3><div class="subtext">Counts in the current selection; not adjusted for population or exposure</div></div>
               </div>
               <div class="surface-body"><div id="chart-cities-hbar"></div></div>
             </div>
@@ -299,8 +299,8 @@
           <div class="surface-body">
             <div class="map-shell" id="map-shell">
               <div class="map-mode-toggle" id="map-mode-toggle">
-                <button class="active" data-mode="points">Points</button>
-                <button data-mode="heatmap">Heatmap</button>
+                <button class="active" data-mode="points" aria-pressed="true">Points</button>
+                <button data-mode="heatmap" aria-pressed="false">Heatmap</button>
               </div>
               <div class="map-controls">
                 <button id="map-zoom-in" aria-label="Zoom in" title="Zoom in"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#lucide-plus"></use></svg></button>
@@ -321,11 +321,11 @@
 
         <div class="grid-2">
           <div class="surface">
-            <div class="surface-header"><div><h3>Top Hotspot Cities</h3><div class="subtext">Ranked by synthetic accident density</div></div></div>
+            <div class="surface-header"><div><h3>Top Hotspot Cities</h3><div class="subtext">Ranked by recorded accident count in this selection</div></div></div>
             <div class="surface-body"><div class="rank-list" id="hotspot-city-list"></div></div>
           </div>
           <div class="surface">
-            <div class="surface-header"><div><h3>Top Hotspot Roads</h3><div class="subtext">Ranked by synthetic accident density</div></div></div>
+            <div class="surface-header"><div><h3>Top Hotspot Roads</h3><div class="subtext">Ranked by recorded accident count in this selection</div></div></div>
             <div class="surface-body"><div class="rank-list" id="hotspot-road-list"></div></div>
           </div>
         </div>
@@ -512,8 +512,8 @@
             <h3>Libya Traffic Intelligence</h3>
             <p class="text-secondary" style="line-height:1.7;">
               Libya Traffic Intelligence is a data-driven road accident analytics and risk analysis platform
-              built as a graduation-style software engineering project. It processes a synthetic
-              2,000+ record accident dataset entirely in the browser — parsing CSV, computing statistics,
+              built as a graduation-style software engineering project. It processes a synthetic dataset
+              of 2,000 accident records entirely in the browser — parsing CSV, computing statistics,
               rendering charts and a stylized map from scratch, and demonstrating a transparent
               rule-based risk-scoring and prediction layer — all without a backend, a framework, or a build step.
             </p>
@@ -545,7 +545,8 @@
             <div class="surface-body">
               <p class="text-secondary" style="line-height:1.7; font-size:13.5px;">
                 Records are parsed with a hand-written quoted-field-aware CSV parser, validated, and
-                converted to typed numeric/derived fields (hour, weekend flag, rush-hour flag).
+                converted to typed numeric fields; the hour is derived from the time, while weekend
+                and rush-hour flags are validated against the date and the dashboard's defined hours.
                 Analytics functions compute distributions, cross-tabulations, and hotspot rankings on
                 demand, so every chart reacts to the active filter set in real time. The risk score is a
                 transparent weighted sum over severity share, fatality rate, road condition, traffic,

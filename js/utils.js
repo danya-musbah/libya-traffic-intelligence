@@ -86,7 +86,7 @@ const Utils = (() => {
       if (r.length !== header.length) {
         throw new Error(`CSV row ${i + 1} has ${r.length} fields; expected ${header.length}.`);
       }
-      const obj = {};
+      const obj = Object.create(null);
       header.forEach((key, idx) => { obj[key] = r[idx]; });
       out.push(obj);
     }

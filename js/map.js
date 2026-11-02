@@ -132,7 +132,7 @@ const MapModule = (() => {
     const group = svgEl('g', { id: 'heat-layer', filter: 'url(#heatBlur)' });
     // bucket into a coarse grid to build density blobs
     const cellSize = 26;
-    const grid = {};
+    const grid = Object.create(null);
     records.forEach(r => {
       const [x, y] = project(r.latitude, r.longitude);
       const key = `${Math.round(x / cellSize)}_${Math.round(y / cellSize)}`;

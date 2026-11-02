@@ -107,6 +107,15 @@ const Charts = (() => {
       const fraction = d.value / total;
       const angle = fraction * 360;
       const largeArc = angle > 180 ? 1 : 0;
+      const color = opts.colorFn ? opts.colorFn(d.label) : colors[i % colors.length];
+      if (fraction === 1) {
+        const ring = svgEl('circle', {
+          cx, cy, r, fill: 'none', stroke: color, 'stroke-width': strokeW, class: 'chart-bar',
+        });
+        attachTooltip(ring, () => `<strong>${Utils.escapeHTML(d.label)}</strong><br>${Utils.numberFormat(d.value)} (${Utils.pct(d.value, total)})`);
+        svg.appendChild(ring);
+        return;
+      }
       const startRad = (angleStart * Math.PI) / 180;
       const endRad = ((angleStart + angle) * Math.PI) / 180;
       const x1 = cx + r * Math.cos(startRad), y1 = cy + r * Math.sin(startRad);
@@ -114,7 +123,7 @@ const Charts = (() => {
       const path = svgEl('path', {
         d: `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`,
         fill: 'none',
-        stroke: opts.colorFn ? opts.colorFn(d.label) : colors[i % colors.length],
+        stroke: color,
         'stroke-width': strokeW,
         class: 'chart-bar',
       });

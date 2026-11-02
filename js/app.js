@@ -26,11 +26,17 @@
 
   function goToPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => {
+      n.classList.remove('active');
+      n.removeAttribute('aria-current');
+    });
     const page = document.getElementById('page-' + pageId);
     const nav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
     if (page) page.classList.add('active');
-    if (nav) nav.classList.add('active');
+    if (nav) {
+      nav.classList.add('active');
+      nav.setAttribute('aria-current', 'page');
+    }
     closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
     renderPage(pageId);
@@ -48,11 +54,17 @@
     });
 
     document.getElementById('sidebar-collapse-btn').addEventListener('click', () => {
-      document.getElementById('app-shell').classList.toggle('sidebar-collapsed');
+      const shell = document.getElementById('app-shell');
+      const button = document.getElementById('sidebar-collapse-btn');
+      const collapsed = shell.classList.toggle('sidebar-collapsed');
+      button.setAttribute('aria-expanded', String(!collapsed));
+      button.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+      button.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
     });
     document.getElementById('mobile-menu-btn').addEventListener('click', () => {
       document.getElementById('sidebar').classList.add('open');
       document.getElementById('sidebar-scrim').classList.add('open');
+      document.getElementById('mobile-menu-btn').setAttribute('aria-expanded', 'true');
     });
     document.getElementById('sidebar-scrim').addEventListener('click', closeMobileSidebar);
   }
@@ -60,6 +72,7 @@
   function closeMobileSidebar() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-scrim').classList.remove('open');
+    document.getElementById('mobile-menu-btn').setAttribute('aria-expanded', 'false');
   }
 
   // ---- Clock ------------------------------------------------------------
@@ -423,7 +436,12 @@
       const tr = Utils.el('tr', {
         onclick: () => openAccidentModal(r),
         tabindex: '0',
-        onkeydown: (e) => { if (e.key === 'Enter') openAccidentModal(r); },
+        onkeydown: (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openAccidentModal(r);
+          }
+        },
       });
       TABLE_COLUMNS.forEach(col => {
         let content;
@@ -481,22 +499,58 @@
 
   // ---- Modal ----------------------------------------------------------------
 
+  let modalReturnFocus = null;
+
   function wireModal() {
+    const overlay = document.getElementById('accident-modal-overlay');
     document.getElementById('modal-close-btn').addEventListener('click', closeModal);
-    document.getElementById('accident-modal-overlay').addEventListener('click', (e) => {
+    overlay.addEventListener('click', (e) => {
       if (e.target.id === 'accident-modal-overlay') closeModal();
     });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (!overlay.classList.contains('open')) return;
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const focusable = Array.from(overlay.querySelectorAll(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter(element => element.getClientRects().length);
+      if (!focusable.length) {
+        e.preventDefault();
+        overlay.querySelector('.modal').focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !overlay.contains(document.activeElement))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !overlay.contains(document.activeElement))) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   function closeModal() {
-    document.getElementById('accident-modal-overlay').classList.remove('open');
+    const overlay = document.getElementById('accident-modal-overlay');
+    if (!overlay.classList.contains('open')) return;
+    overlay.classList.remove('open');
     document.body.classList.remove('no-scroll');
+    if (modalReturnFocus && modalReturnFocus.isConnected) modalReturnFocus.focus();
+    modalReturnFocus = null;
   }
 
   function openAccidentModal(r) {
     const overlay = document.getElementById('accident-modal-overlay');
     const body = document.getElementById('modal-body');
+    const activeElement = document.activeElement;
+    modalReturnFocus = activeElement && activeElement !== document.body && typeof activeElement.focus === 'function'
+      ? activeElement
+      : null;
     document.getElementById('modal-title').textContent = `Accident ${r.accident_id}`;
 
     const rows = [
@@ -541,6 +595,7 @@
 
     overlay.classList.add('open');
     document.body.classList.add('no-scroll');
+    document.getElementById('modal-close-btn').focus();
   }
 
   // ==========================================================================
@@ -573,6 +628,7 @@
       btn.addEventListener('click', () => {
         document.querySelectorAll('#map-mode-toggle button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        document.querySelectorAll('#map-mode-toggle button').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
         currentMapMode = btn.dataset.mode;
         MapModule.render(document.getElementById('map-container'), AppState.filtered, currentMapMode);
       });

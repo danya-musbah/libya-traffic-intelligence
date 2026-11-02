@@ -23,7 +23,7 @@ const Analytics = (() => {
   }
 
   function countBy(records, field) {
-    const map = {};
+    const map = Object.create(null);
     records.forEach(r => { map[r[field]] = (map[r[field]] || 0) + 1; });
     return map;
   }
@@ -74,7 +74,7 @@ const Analytics = (() => {
 
   function monthlyTrend(records) {
     // group by year-month for a real chronological trend line
-    const map = {};
+    const map = Object.create(null);
     records.forEach(r => {
       const key = `${r.year}-${String(Utils.monthIndex(r.month) + 1).padStart(2, '0')}`;
       map[key] = (map[key] || 0) + 1;
@@ -97,7 +97,7 @@ const Analytics = (() => {
   // ---- Hotspots -------------------------------------------------------------
 
   function calculateHotspots(records, n = 10) {
-    const byCity = {};
+    const byCity = Object.create(null);
     records.forEach(r => {
       if (!byCity[r.city]) byCity[r.city] = { city: r.city, count: 0, severe: 0, fatalities: 0, injuries: 0 };
       const c = byCity[r.city];
@@ -116,7 +116,7 @@ const Analytics = (() => {
   }
 
   function roadHotspots(records, n = 10) {
-    const byRoad = {};
+    const byRoad = Object.create(null);
     records.forEach(r => {
       const key = `${r.road_name} (${r.city})`;
       if (!byRoad[key]) byRoad[key] = { road: key, count: 0, severe: 0 };
@@ -208,7 +208,12 @@ const Analytics = (() => {
 
     const closures = records.filter(r => r.road_closed === 1).length;
     if (closures > 0) {
-      insights.push(`Road closures followed <strong>${Utils.pct(closures, total)}</strong> of accidents, most often after Severe or Critical incidents.`);
+      const severeCriticalClosures = records.filter(r =>
+        r.road_closed === 1 && (r.severity === 'Severe' || r.severity === 'Critical')).length;
+      insights.push(
+        `Road closures followed <strong>${Utils.pct(closures, total)}</strong> of accidents. ` +
+        `${Utils.pct(severeCriticalClosures, closures)} of closed-road records involved Severe or Critical accidents.`
+      );
     }
 
     return insights;
